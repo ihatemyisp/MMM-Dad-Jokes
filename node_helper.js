@@ -6,7 +6,7 @@
  */
 
 var NodeHelper = require('node_helper');
-var request = require('request');
+var fetch = require('node-fetch');
 
 module.exports = NodeHelper.create({
 	start: function () {
@@ -15,17 +15,22 @@ module.exports = NodeHelper.create({
 
 	getJoke: function (url) {
 		var parent = this; // save this object
-		request({ url: 'https://icanhazdadjoke.com',
-			headers:{
-				'Accept':'application/json',
-				'User-Agent': 'MMM-Dad-Jokes (https://github.com/echang15/MMM-Dad-Jokes)'
-			},
-			method: 'GET' }, function (error, response, body) {
-			if (!error && response.statusCode == 200) {
-				var result = JSON.parse(response.body);
-				parent.sendSocketNotification('JOKE_RESULT', result);
-			}
-		});
+		fetch('https://icanhazdadjoke.com', {
+			headers: { 'Accept': 'application/json', 'User-Agent': 'MMM-Dad-Jokes (https://github.com/echang15/MMM-Dad-Jokes)' }
+		})
+			.then(res => res.json())
+			.then(json => parent.sendSocketNotification('JOKE_RESULT', json));
+		//request({ url: 'https://icanhazdadjoke.com',
+		//	headers:{
+		//		'Accept':'application/json',
+		//		'User-Agent': 'MMM-Dad-Jokes (https://github.com/echang15/MMM-Dad-Jokes)'
+		//	},
+		//	method: 'GET' }, function (error, response, body) {
+		//	if (!error && response.statusCode == 200) {
+		//		var result = JSON.parse(response.body);
+		//		parent.sendSocketNotification('JOKE_RESULT', result);
+		//	}
+		//});
 	},
 
 	socketNotificationReceived: function(notification, payload) {
